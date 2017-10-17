@@ -1,53 +1,38 @@
 package concurrencybench
 
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.concurrent.ThreadLocalRandom
-
-import scala.collection.mutable.ArrayBuffer
+import java.util.concurrent.ConcurrentHashMap
 
 class StandardForum extends Forum {
-  val lock = new ReentrantReadWriteLock()
-  val threads = new ArrayBuffer[String]()
+  val threads = new ConcurrentHashMap[Int,String]()
 
   def readThread(threadId: Int): String = {
-    lock.readLock().lock()
-    val msg = try {
-      threads(threadId)
-    } finally {
-      lock.readLock().unlock()
-    }
-
-    msg
+    threads.get(threadId)
   }
 
   def replyToThread(threadId: Int, msg: String): Unit = {
-    lock.writeLock().lock()
-    try {
-      threads.update(threadId, msg)
-    } finally {
-      lock.writeLock().unlock()
-    }
+    threads.put(threadId, msg)
   }
 
   def createThread(): Unit = {
-    lock.writeLock().lock()
-    try {
-      threads += "New Thread\n"
-    } finally {
-      lock.writeLock().unlock()
+    val random = ThreadLocalRandom.current()
+
+    var continue = true
+    while (continue) {
+      val threadId = random.nextInt()
+
+      if (threads.putIfAbsent(threadId, "New Thread\n") != null) {
+        continue = false
+      }
     }
   }
 
   def getRandomThreadId(): Int = {
     val random = ThreadLocalRandom.current()
 
-    lock.readLock().lock()
-    val numThreads = try {
-      threads.size
-    } finally {
-      lock.readLock().unlock()
-    }
+    val threadIds = java.util.Collections.list(threads.keys())
+    val index = random.nextInt(threadIds.size)
 
-    random.nextInt(numThreads)
+    threadIds.get(index)
   }
 }

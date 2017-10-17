@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.CountDownLatch
 
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
-//@BenchmarkMode(Array(Mode.Throughput))
+@BenchmarkMode(Array(Mode.All))
 class Benchmarks {
 
   @Benchmark
