@@ -7,23 +7,31 @@ import scala.collection.mutable.ArrayBuffer
 
 class CustomForum extends Forum {
   val lock = new ReentrantReadWriteLock()
-  val threads = new ArrayBuffer[String]()
+  val threads = new ArrayBuffer[ForumThread]()
 
-  def readThread(threadId: Int): String = {
+  def readThread(threadId: Int): Option[String] = {
     lock.readLock().lock()
-    val msg = try {
+    val value = try {
       threads(threadId)
     } finally {
       lock.readLock().unlock()
     }
 
-    msg
+    value match {
+      case Left(_) => None
+      case Right(msg) => Some(msg)
+    }
   }
 
-  def replyToThread(threadId: Int, msg: String): Unit = {
+  def replyToThread(threadId: Int, msg: String): Boolean = {
     lock.writeLock().lock()
     try {
-      threads.update(threadId, msg)
+      if (threads(threadId).isRight) {
+        threads.update(threadId, Right(msg))
+        true
+      } else {
+        false
+      }
     } finally {
       lock.writeLock().unlock()
     }
@@ -32,7 +40,7 @@ class CustomForum extends Forum {
   def createThread(): Unit = {
     lock.writeLock().lock()
     try {
-      threads += "New Thread\n"
+      threads += Right("New Thread\n")
     } finally {
       lock.writeLock().unlock()
     }
@@ -49,5 +57,18 @@ class CustomForum extends Forum {
     }
 
     random.nextInt(numThreads)
+  }
+
+  def closeThread(threadId: Int): Unit = {
+    lock.writeLock().lock()
+    try {
+      val newMsg = threads(threadId) match {
+        case Left(msg) => Left(msg)
+        case Right(msg) => Left(msg)
+      }
+      threads.update(threadId, newMsg)
+    } finally {
+      lock.writeLock().unlock()
+    }
   }
 }

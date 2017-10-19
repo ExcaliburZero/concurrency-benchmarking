@@ -1,8 +1,11 @@
 package concurrencybench
 
 trait Forum {
-  def readThread(threadId: Int): String
-  def replyToThread(threadId: Int, msg: String): Unit
+  type ForumThread = Either[String,String]
+
+  def readThread(threadId: Int): Option[String]
+  def replyToThread(threadId: Int, msg: String): Boolean
   def createThread(): Unit
   def getRandomThreadId(): Int
+  def closeThread(threadId: Int): Unit
 }
