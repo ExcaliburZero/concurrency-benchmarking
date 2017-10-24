@@ -53,5 +53,6 @@ project/target/
 project/project/
 
 ### Data files & plots
-plots/
+webpage/plots/
+webpage/index.html
 results.csv

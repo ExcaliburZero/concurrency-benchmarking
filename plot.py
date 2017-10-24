@@ -12,7 +12,7 @@ def main():
     standard = "standard"
 
     data_file = "results.csv"
-    plots_dir = "plots"
+    plots_dir = os.path.join("webpage", "plots")
 
     data = pd.read_csv(data_file)
 
@@ -28,7 +28,7 @@ def main():
         s_score = data[data[benchmark] == s][score].iloc[0]
 
         score_unit = data[data[benchmark] == s][unit].iloc[0]
-        score_name = data[data[benchmark] == s][benchmark].iloc[0].replace(standard, "")
+        score_name = data[data[benchmark] == s][benchmark].iloc[0].replace(standard, "").replace("·", "").replace(":", "")
         score_mode = data[data[benchmark] == s][mode].iloc[0]
 
         objects = [custom, standard]

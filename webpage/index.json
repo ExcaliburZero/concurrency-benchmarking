@@ -1,0 +1,14 @@
+{
+    "plots": [
+        {"image": "concurrencybench-Benchmarks-.png"},
+        {"image": "concurrencybench-Benchmarks-p0-00.png"},
+        {"image": "concurrencybench-Benchmarks-p0-50.png"},
+        {"image": "concurrencybench-Benchmarks-p0-90.png"},
+        {"image": "concurrencybench-Benchmarks-p0-95.png"},
+        {"image": "concurrencybench-Benchmarks-p0-9999.png"},
+        {"image": "concurrencybench-Benchmarks-p0-999.png"},
+        {"image": "concurrencybench-Benchmarks-p0-99.png"},
+        {"image": "concurrencybench-Benchmarks-p1-00.png"},
+        {"image": "concurrencybench-Benchmarks-.png"}
+    ]
+}
