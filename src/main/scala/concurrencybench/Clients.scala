@@ -22,19 +22,29 @@ class User(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, b
       if (action == 0) {
         if ((count / interval) % interval2 == 0) {
           forum.createThread()
-          println("Opened thread")
+          //println("Opened thread")
         } else {
           val threadId = forum.getRandomThreadId()
-          forum.replyToThread(threadId, count.toString)
+          val succeeded = forum.replyToThread(threadId, count.toString)
+          if (!succeeded) {
+            //println("Tried to write to closed thread")
+          }
         }
       } else {
-        val threadId = forum.getRandomThreadId()
-        val msg = forum.readThread(threadId)
-        blackhole.consume(msg)
-        //println(msg)
+        var readThread = false
+        while (!readThread) {
+          val threadId = forum.getRandomThreadId()
+          val msg = forum.readThread(threadId)
+          msg match {
+            case Some(m) =>
+              blackhole.consume(msg)
+              readThread = true
+            case None => ()
+          }
+        }
       }
 
-      Thread.sleep(100 + action + Math.abs((interval + count).toString.hashCode % 200))
+      Thread.sleep((100 + action + Math.abs((interval + count).toString.hashCode % 200)) / 10)
 
       if (count > limit) {
         continue = false
@@ -60,12 +70,12 @@ class Moderator(forum: Forum, countdown: CountDownLatch, limit: Int, interval: I
         if ((count / interval) % interval2 == 0) {
           val threadId = forum.getRandomThreadId()
           forum.closeThread(threadId)
-          println("Closed thread")
+          //println("Closed thread")
         } else {
           val threadId = forum.getRandomThreadId()
           val succeeded = forum.replyToThread(threadId, count.toString)
           if (!succeeded) {
-            println("Tried to write to closed thread")
+            //println("Tried to write to closed thread")
           }
         }
       } else if (action == 1 && count % 5 == 0) {
@@ -84,7 +94,7 @@ class Moderator(forum: Forum, countdown: CountDownLatch, limit: Int, interval: I
         //println(msg)
       }
 
-      Thread.sleep(100 + action + Math.abs((interval + count).toString.hashCode % 200))
+      Thread.sleep((100 + action + Math.abs((interval + count).toString.hashCode % 200)) / 10)
 
       if (count > limit) {
         continue = false

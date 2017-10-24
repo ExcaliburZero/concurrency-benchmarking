@@ -1,4 +1,4 @@
-package concurrencybench
+/*package concurrencybench
 
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -11,21 +11,27 @@ import java.util.concurrent.CountDownLatch
 
 //@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Array(Mode.All))
-class Benchmarks {
+class MicroBenchmarks {
 
   @Benchmark
-  def standard(blackhole: Blackhole): Unit = {
+  def standardReadThread(blackhole: Blackhole): Unit = {
     val forum = new StandardForum()
-    simulation(forum, blackhole)
+    initializeForum(forum)
   }
 
   @Benchmark
-  def custom(blackhole: Blackhole): Unit = {
+  def customReadThread(blackhole: Blackhole): Unit = {
     val forum = new CustomForum()
-    simulation(forum, blackhole)
+    initializeForum(forum)
   }
 
-  def simulation(forum: Forum, blackhole: Blackhole): Unit = {
+  def initializeForum(forum: Forum): Unit = {
+    for (_ <- 0 until 50) {
+      forum.createThread()
+    }
+  }
+
+  /*def simulation(forum: Forum, blackhole: Blackhole): Unit = {
     forum.createThread()
 
     val numClients = 100//1000//25
@@ -48,5 +54,5 @@ class Benchmarks {
       thread.start()
     }
     countdown.await()
-  }
-}
+  }*/
+}*/
