@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
+import os.path
 import pandas as pd
 
 def main():
     benchmark = "Benchmark"
+    mode = "Mode"
     score = "Score"
     unit = "Unit"
 
@@ -10,6 +12,8 @@ def main():
     standard = "standard"
 
     data_file = "results.csv"
+    plots_dir = "plots"
+
     data = pd.read_csv(data_file)
 
     print(data)
@@ -23,22 +27,22 @@ def main():
         c_score = data[data[benchmark] == c][score].iloc[0]
         s_score = data[data[benchmark] == s][score].iloc[0]
 
-        u = data[data[benchmark] == s][unit].iloc[0]
-        b = data[data[benchmark] == s][benchmark].iloc[0]
+        score_unit = data[data[benchmark] == s][unit].iloc[0]
+        score_name = data[data[benchmark] == s][benchmark].iloc[0].replace(standard, "")
+        score_mode = data[data[benchmark] == s][mode].iloc[0]
 
-        objects = [c, s]
-        y_pos = [0, 1]
+        objects = [custom, standard]
+        pos = [0, 1]
         performance = [c_score, s_score]
 
-        plt.barh(y_pos, performance, align="center", alpha=0.5)
-        plt.yticks(y_pos, objects)
-        plt.xlabel(u)
-        plt.title(b)
- 
-        plt.show()
+        plt.bar(pos, performance, align="center", alpha=0.5)
+        plt.xticks(pos, objects)
+        plt.ylabel(score_mode + " (" + score_unit + ")")
+        plt.title(score_name)
 
-        print(c, s)
-        print(c_score, s_score)
+        plot_file_name = os.path.join(plots_dir, score_name.replace(".", "-") + ".png")
+        plt.savefig(plot_file_name)
+        plt.clf()
 
 if __name__ == "__main__":
     main()
