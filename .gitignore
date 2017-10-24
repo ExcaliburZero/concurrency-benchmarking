@@ -51,3 +51,7 @@ fabric.properties
 target/
 project/target/
 project/project/
+
+### Data files & plots
+plots/
+results.csv
