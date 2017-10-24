@@ -12,5 +12,6 @@ sbt "jmh:run -i 5 -wi 5 -t1 -rf csv -rff results.csv"
 Once you have the results from running JMH, you can create the plots  by running the following command:
 
 ```
+mkdir plots
 python3 plot.py
 ```
