@@ -26,11 +26,12 @@ class CustomForum extends Forum {
   def replyToThread(threadId: Int, msg: String): Boolean = {
     lock.writeLock().lock()
     try {
-      if (threads(threadId).isRight) {
-        threads.update(threadId, Right(msg))
-        true
-      } else {
-        false
+      threads(threadId) match {
+        case Right(prev) =>
+          threads.update(threadId, Right(prev + msg))
+          true
+        case Left(_) =>
+          false
       }
     } finally {
       lock.writeLock().unlock()
@@ -62,7 +63,7 @@ class CustomForum extends Forum {
   def closeThread(threadId: Int): Unit = {
     lock.writeLock().lock()
     try {
-      val newMsg = threads(threadId) match {
+      val newMsg: ForumThread = threads(threadId) match {
         case Left(msg) => Left(msg)
         case Right(msg) => Left(msg)
       }

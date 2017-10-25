@@ -24,9 +24,9 @@ class StandardForum extends Forum {
     val func: BiFunction[Int,ForumThread,ForumThread] = (key, value) => {
       value match {
         case Left(_) => value
-        case Right(_) =>
+        case Right(prev) =>
           changed = true
-          Right(msg)
+          Right(prev + msg)
       }
     }
     threads.compute(threadId, func)
