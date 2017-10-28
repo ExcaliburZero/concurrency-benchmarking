@@ -42,21 +42,33 @@ class Benchmarks {
   }
 
   @Benchmark
-  def standard(blackhole: Blackhole): Unit = {
+  def standard5(blackhole: Blackhole): Unit = {
     val forum = new StandardForum()
-    simulation(forum, blackhole)
+    simulation(forum, blackhole, 5)
   }
 
   @Benchmark
-  def custom(blackhole: Blackhole): Unit = {
+  def custom5(blackhole: Blackhole): Unit = {
     val forum = new CustomForum()
-    simulation(forum, blackhole)
+    simulation(forum, blackhole, 5)
   }
 
-  def simulation(forum: Forum, blackhole: Blackhole): Unit = {
+  @Benchmark
+  def standard10(blackhole: Blackhole): Unit = {
+    val forum = new StandardForum()
+    simulation(forum, blackhole, 10)
+  }
+
+  @Benchmark
+  def custom10(blackhole: Blackhole): Unit = {
+    val forum = new CustomForum()
+    simulation(forum, blackhole, 10)
+  }
+
+  def simulation(forum: Forum, blackhole: Blackhole, numClients: Int): Unit = {
     forum.createThread()
 
-    val numClients = 100//1000//25
+    //val numClients = 10//100//1000//25
     val start = 1
     val moderatorRatio = 5
     val duration = 150//200
