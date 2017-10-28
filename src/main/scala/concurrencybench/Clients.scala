@@ -8,7 +8,7 @@ abstract class Client(forum: Forum) {
   def start(): Unit
 }
 
-class User(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, blackhole: Blackhole) extends Client(forum) {
+class User(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, blackhole: Blackhole, username: String, mc: MarkovChain) extends Client(forum) {
   val interval2: Int = 8
 
   var count: Int = 1
@@ -25,7 +25,7 @@ class User(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, b
           //println("Opened thread")
         } else {
           val threadId = forum.getRandomThreadId()
-          val succeeded = forum.replyToThread(threadId, count.toString)
+          val succeeded = forum.replyToThread(threadId, "\n~~~~~~~~~~~~~~~~~~~~~~~\n" + username + "\n" + mc.generateSentence())
           if (!succeeded) {
             //println("Tried to write to closed thread")
           }
@@ -56,7 +56,7 @@ class User(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, b
   }
 }
 
-class Moderator(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, blackhole: Blackhole) extends Client(forum) {
+class Moderator(forum: Forum, countdown: CountDownLatch, limit: Int, interval: Int, blackhole: Blackhole, username: String, mc: MarkovChain) extends Client(forum) {
   val interval2: Int = 2
 
   var count: Int = 1
@@ -73,7 +73,7 @@ class Moderator(forum: Forum, countdown: CountDownLatch, limit: Int, interval: I
           //println("Closed thread")
         } else {
           val threadId = forum.getRandomThreadId()
-          val succeeded = forum.replyToThread(threadId, count.toString)
+          val succeeded = forum.replyToThread(threadId, mc.generateSentence())
           if (!succeeded) {
             //println("Tried to write to closed thread")
           }

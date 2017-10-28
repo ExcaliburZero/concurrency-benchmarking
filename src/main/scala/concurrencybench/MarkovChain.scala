@@ -34,7 +34,7 @@ class MarkovChain(private val wordLimit: Int) {
     for (s <- allSentences) yield addSentence(s) 
   }
 
-  private def addSentence(sentence: String): Unit = {
+  def addSentence(sentence: String): Unit = {
     val sentenceWords = MarkovChain.START +: sentence.split(" ").filter(_.length > 0) :+ MarkovChain.END
 
     if (sentenceWords.length > 0) {

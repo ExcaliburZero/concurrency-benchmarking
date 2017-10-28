@@ -41,7 +41,7 @@ class CustomForum extends Forum {
   def createThread(): Unit = {
     lock.writeLock().lock()
     try {
-      threads += Right("New Thread\n")
+      threads += Right("")
     } finally {
       lock.writeLock().unlock()
     }

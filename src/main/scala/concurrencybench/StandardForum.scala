@@ -40,7 +40,7 @@ class StandardForum extends Forum {
     while (continue) {
       val threadId = random.nextInt()
 
-      if (threads.putIfAbsent(threadId, Right("New Thread\n")) != null) {
+      if (threads.putIfAbsent(threadId, Right("")) != null) {
         continue = false
       }
     }
