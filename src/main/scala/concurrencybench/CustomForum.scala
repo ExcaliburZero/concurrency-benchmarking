@@ -1,20 +1,19 @@
 package concurrencybench
 
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.concurrent.ThreadLocalRandom
 
 import scala.collection.mutable.ArrayBuffer
 
 class CustomForum extends Forum {
-  val lock = new ReentrantReadWriteLock()
+  val lock = new ReadWriteLock()
   val threads = new ArrayBuffer[ForumThread]()
 
   def readThread(threadId: Int): Option[String] = {
-    lock.readLock().lock()
+    lock.lockRead()
     val value = try {
       threads(threadId)
     } finally {
-      lock.readLock().unlock()
+      lock.unlockRead()
     }
 
     value match {
@@ -24,7 +23,7 @@ class CustomForum extends Forum {
   }
 
   def replyToThread(threadId: Int, msg: String): Boolean = {
-    lock.writeLock().lock()
+    lock.lockWrite()
     try {
       threads(threadId) match {
         case Right(prev) =>
@@ -34,34 +33,34 @@ class CustomForum extends Forum {
           false
       }
     } finally {
-      lock.writeLock().unlock()
+      lock.unlockWrite()
     }
   }
 
   def createThread(): Unit = {
-    lock.writeLock().lock()
+    lock.lockWrite()
     try {
       threads += Right("")
     } finally {
-      lock.writeLock().unlock()
+      lock.unlockWrite()
     }
   }
 
   def getRandomThreadId(): Int = {
     val random = ThreadLocalRandom.current()
 
-    lock.readLock().lock()
+    lock.lockRead()
     val numThreads = try {
       threads.size
     } finally {
-      lock.readLock().unlock()
+      lock.unlockRead()
     }
 
     random.nextInt(numThreads)
   }
 
   def closeThread(threadId: Int): Unit = {
-    lock.writeLock().lock()
+    lock.lockWrite()
     try {
       val newMsg: ForumThread = threads(threadId) match {
         case Left(msg) => Left(msg)
@@ -69,7 +68,7 @@ class CustomForum extends Forum {
       }
       threads.update(threadId, newMsg)
     } finally {
-      lock.writeLock().unlock()
+      lock.unlockWrite()
     }
   }
 }
