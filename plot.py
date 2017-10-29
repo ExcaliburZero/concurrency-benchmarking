@@ -1,46 +1,68 @@
 import matplotlib.pyplot as plt
 import os.path
 import pandas as pd
+import seaborn as sns
+
+benchmark = "Benchmark"
+mode = "Mode"
+score = "Score"
+unit = "Unit"
+server = "Server"
+data_structure = "Data Structure"
+load = "Load"
+test = "Test"
+
+custom = "custom"
+standard = "standard"
+
+plots_dir = os.path.join("webpage", "plots")
 
 def main():
-    benchmark = "Benchmark"
-    mode = "Mode"
-    score = "Score"
-    unit = "Unit"
+    data_files = [
+        ("Wolf", "results_wolf.csv"),
+        ("Rho", "results_rho.csv")
+    ]
 
-    custom = "custom"
-    standard = "standard"
+    dfs = processDataFrames(data_files)
 
-    data_file = "results.csv"
-    plots_dir = os.path.join("webpage", "plots")
+    final_data = pd.concat(dfs)
+    print(final_data)
 
-    data = pd.read_csv(data_file)
+    plotData(final_data)
 
-    print(data)
+def processDataFrames(data_files):
+    for (s, df) in data_files:
+        data = pd.read_csv(df)
 
-    benchmarks = data[benchmark].unique()
+        data[server] = s
+        data[data_structure] = data[benchmark].map(
+                lambda x: custom if custom in x else standard)
+        data[load] = data[benchmark].map(
+                lambda x: 10 if "10" in x else 5)
 
-    custom_benchmarks = [b for b in benchmarks if custom in b]
-    standard_benchmarks = [b.replace(custom, standard) for b in custom_benchmarks]
+        data[test] = data[server] + " " + data[data_structure]
 
-    for (c, s) in zip(custom_benchmarks, standard_benchmarks):
-        c_score = data[data[benchmark] == c][score].iloc[0]
-        s_score = data[data[benchmark] == s][score].iloc[0]
+        yield data
 
-        score_unit = data[data[benchmark] == s][unit].iloc[0]
-        score_name = data[data[benchmark] == s][benchmark].iloc[0].replace(standard, "").replace("·", "").replace(":", "")
-        score_mode = data[data[benchmark] == s][mode].iloc[0]
+mode_names = {
+    "ss": "Single Shot",
+    "thrpt": "Throughput",
+    "avgt": "Average Time"        
+}
 
-        objects = [custom, standard]
-        pos = [0, 1]
-        performance = [c_score, s_score]
+def plotData(data):
+    modes = data[mode].unique()
 
-        plt.bar(pos, performance, align="center", alpha=0.5)
-        plt.xticks(pos, objects)
-        plt.ylabel(score_mode + " (" + score_unit + ")")
-        plt.title(score_name)
+    for m in modes:
+        data_m = data[data[mode] == m]
+        value_units = data_m[unit].iloc[0]
 
-        plot_file_name = os.path.join(plots_dir, score_name.replace(".", "-") + ".png")
+        sns.pointplot(x=load, y=score, hue=test, data=data_m)
+        plt.title(mode_names[m])
+        plt.xlabel("Load (users)")
+        plt.ylabel("Mean " + value_units)
+
+        plot_file_name = os.path.join(plots_dir, m + ".png")
         plt.savefig(plot_file_name)
         plt.clf()
 
