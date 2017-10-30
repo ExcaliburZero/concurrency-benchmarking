@@ -47,7 +47,7 @@ def processDataFrames(data_files):
 mode_names = {
     "ss": "Single Shot",
     "thrpt": "Throughput",
-    "avgt": "Average Time"        
+    "avgt": "Average Time"
 }
 
 def plotData(data):

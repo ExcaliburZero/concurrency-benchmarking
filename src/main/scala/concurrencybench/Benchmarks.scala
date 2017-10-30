@@ -13,31 +13,26 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.CountDownLatch
 
-//@OutputTimeUnit(TimeUnit.MILLISECONDS)
-//@BenchmarkMode(Array(Mode.All))
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime, Mode.SingleShotTime))
 @State(Scope.Benchmark)
 class Benchmarks {
+  val debug = false
+
   val delimiter = "<\\*>\\(<\\*>\\)<\\*>"
   val wordLimit = 100
   val userFiles = new File("users").listFiles
 
   val chains: Array[(String, MarkovChain)] = for (f <- userFiles) yield loadUser(f)
 
-  for ((u, mc) <- chains) {
-    //println(u + ": " + mc.generateSentence())
-  }
-
   def loadUser(userFile: File): (String, MarkovChain) = {
     val mc = new MarkovChain(wordLimit)
-    //mc.addFromFile(userFile)
-    // Split file on delimiters and then add all
+
     val source = scala.io.Source.fromFile(userFile)
     val lines: String = try source.getLines mkString "\n" finally source.close()
+
     val sentences = lines.split(delimiter)
-    //for (s <- sentences) yield println(s)
-    //println(sentences.length)
     for (s <- sentences) yield mc.addSentence(s)
+
     (userFile.toString.dropRight(4), mc)
   }
 
@@ -68,10 +63,9 @@ class Benchmarks {
   def simulation(forum: Forum, blackhole: Blackhole, numClients: Int): Unit = {
     forum.createThread()
 
-    //val numClients = 10//100//1000//25
     val start = 1
     val moderatorRatio = 5
-    val duration = 150//200
+    val duration = 150
 
     val countdown = new CountDownLatch(numClients)
 
@@ -89,17 +83,19 @@ class Benchmarks {
     }
     countdown.await()
 
-    /*var continue = true
-    while (continue) {
-      val msg = forum.readThread(forum.getRandomThreadId())
+    if (debug) {
+      var continue = true
+      while (continue) {
+        val msg = forum.readThread(forum.getRandomThreadId())
 
-      msg match {
-        case Some(m) =>
-          continue = false
-          println(m)
-        case None =>
-          ()
+        msg match {
+          case Some(m) =>
+            continue = false
+            println(m)
+          case None =>
+            ()
+        }
       }
-    }*/
+    }
   }
 }
