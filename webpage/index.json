@@ -2,6 +2,12 @@
     "plots": [
         {"image": "avgt.png"},
         {"image": "ss.png"},
-        {"image": "thrpt.png"}
+        {"image": "thrpt.png"},
+        {"image": "CloseThread_avgt.png"},
+        {"image": "CloseThread_thrpt.png"},
+        {"image": "ReadThread_avgt.png"},
+        {"image": "ReadThread_thrpt.png"},
+        {"image": "ReplyToThread_avgt.png"},
+        {"image": "ReplyToThread_thrpt.png"}
     ]
 }
